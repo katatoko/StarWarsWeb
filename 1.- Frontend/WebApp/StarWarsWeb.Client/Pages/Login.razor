@@ -1,0 +1,184 @@
+﻿@page "/login"
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@using DTOs.Auth
+@using StarWarsWeb.Client.Utils
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UserState UserState
+
+<div class="d-flex justify-content-center align-items-center py-5" style="min-height: 80vh;">
+    <div class="card shadow-lg p-4 p-md-5" style="max-width: 460px; width: 100%; background: #151515; border: 2px solid #ffe81f; border-radius: 16px; box-shadow: 0 0 25px rgba(255, 232, 31, 0.2) !important;">
+
+        <div class="text-center mb-4">
+            <h2 class="fw-bold mb-1" style="color: #ffe81f; letter-spacing: 3px; font-family: sans-serif;">STAR WARS</h2>
+            <p class="small fw-semibold" style="color: #d1d1d1;">
+                @(esRegistro ? "🚀 Crea tu cuenta de la Alianza Rebelde" : "⚔️ Ingreso a la base de datos de los Jedi")
+            </p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(mensajeError))
+        {
+            <div class="alert alert-danger py-2 px-3 small border-0 text-white" style="background-color: #dc3545;" role="alert">
+                ⚠️ @mensajeError
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(mensajeExito))
+        {
+            <div class="alert alert-success py-2 px-3 small border-0 text-white" style="background-color: #198754;" role="alert">
+                ✅ @mensajeExito
+            </div>
+        }
+
+        @if (!esRegistro)
+        {
+            <!-- FORMULARIO DE LOGIN -->
+            <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold" style="color: #ffe81f;">CORREO ELECTRÓNICO</label>
+                    <InputText @bind-Value="loginModel.Email" class="form-control text-white border-secondary" style="background: #222;" placeholder="ejemplo@galaxy.com" />
+                    <ValidationMessage For="@(() => loginModel.Email)" class="text-danger small mt-1" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold" style="color: #ffe81f;">CONTRASEÑA</label>
+                    <InputText @bind-Value="loginModel.Password" type="password" class="form-control text-white border-secondary" style="background: #222;" placeholder="••••••" />
+                    <ValidationMessage For="@(() => loginModel.Password)" class="text-danger small mt-1" />
+                </div>
+
+                <button type="submit" class="btn w-100 fw-bold py-2" style="background-color: #ffe81f; color: #000; border-radius: 8px; font-size: 1rem;" disabled="@cargando">
+                    @(cargando ? "Accediendo a los archivos..." : "Iniciar Sesión")
+                </button>
+            </EditForm>
+        }
+        else
+        {
+            <!-- FORMULARIO DE REGISTRO -->
+            <EditForm Model="@registerModel" OnValidSubmit="HandleRegister">
+                <DataAnnotationsValidator />
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold" style="color: #ffe81f;">NOMBRE COMPLETO</label>
+                    <InputText @bind-Value="registerModel.FullName" class="form-control text-white border-secondary" style="background: #222;" placeholder="Luke Skywalker" />
+                    <ValidationMessage For="@(() => registerModel.FullName)" class="text-danger small mt-1" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold" style="color: #ffe81f;">NOMBRE DE USUARIO</label>
+                    <InputText @bind-Value="registerModel.UserName" class="form-control text-white border-secondary" style="background: #222;" placeholder="skywalker" />
+                    <ValidationMessage For="@(() => registerModel.UserName)" class="text-danger small mt-1" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold" style="color: #ffe81f;">CORREO ELECTRÓNICO</label>
+                    <InputText @bind-Value="registerModel.Email" class="form-control text-white border-secondary" style="background: #222;" placeholder="luke@rebellion.org" />
+                    <ValidationMessage For="@(() => registerModel.Email)" class="text-danger small mt-1" />
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold" style="color: #ffe81f;">CONTRASEÑA</label>
+                    <InputText @bind-Value="registerModel.Password" type="password" class="form-control text-white border-secondary" style="background: #222;" placeholder="••••••" />
+                    <ValidationMessage For="@(() => registerModel.Password)" class="text-danger small mt-1" />
+                </div>
+
+                <button type="submit" class="btn w-100 fw-bold py-2" style="background-color: #ffe81f; color: #000; border-radius: 8px; font-size: 1rem;" disabled="@cargando">
+                    @(cargando ? "Creando credencial..." : "Crear Cuenta")
+                </button>
+            </EditForm>
+        }
+
+        <div class="text-center mt-4 pt-2 border-top border-secondary">
+            <button class="btn btn-link text-decoration-none small fw-semibold" style="color: #ffe81f;" @onclick="ToggleModo">
+                @(esRegistro ? "¿Ya tienes cuenta? Inicia sesión aquí" : "¿No tienes cuenta? Regístrate aquí")
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private bool esRegistro = false;
+    private bool cargando = false;
+    private string? mensajeError;
+    private string? mensajeExito;
+
+    private LoginDto loginModel = new();
+    private RegisterDto registerModel = new();
+
+    private void ToggleModo()
+    {
+        esRegistro = !esRegistro;
+        mensajeError = null;
+        mensajeExito = null;
+    }
+
+    private async Task HandleLogin()
+    {
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/login", loginModel);
+            var resultado = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
+
+            if (response.IsSuccessStatusCode && resultado?.IsSuccess == true)
+            {
+                // Guarda la sesión en memoria
+                UserState.SetUser(resultado.FullName ?? resultado.Email ?? "Usuario", resultado.Email ?? "");
+
+                // Entra al catálogo
+                Navigation.NavigateTo("/characters");
+            }
+
+            else
+            {
+                mensajeError = resultado?.Message ?? "Credenciales inválidas.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "No se pudo conectar con el servidor: " + ex.Message;
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task HandleRegister()
+    {
+        cargando = true;
+        mensajeError = null;
+        mensajeExito = null;
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/auth/register", registerModel);
+            var resultado = await response.Content.ReadFromJsonAsync<AuthResponseDto>();
+
+            if (response.IsSuccessStatusCode && resultado?.IsSuccess == true)
+            {
+                mensajeExito = "¡Cuenta creada con éxito! Ya puedes iniciar sesión.";
+                esRegistro = false;
+                loginModel.Email = registerModel.Email ?? "";
+            }
+            else
+            {
+                mensajeError = resultado?.Message ?? "Error al registrar el usuario.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "No se pudo conectar con el servidor: " + ex.Message;
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+}

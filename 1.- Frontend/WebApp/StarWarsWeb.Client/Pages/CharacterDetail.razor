@@ -1,0 +1,156 @@
+@page "/character/{id}"
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@using DTOs
+@using StarWarsWeb.Client.Utils
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UserState UserState
+
+<PageTitle>@(personaje != null ? personaje.Name : "Detalle del Personaje")</PageTitle>
+
+<div class="container mt-4 mb-5" style="max-width: 800px;">
+    
+    <div class="mb-4">
+        <a href="/characters" class="btn btn-outline-warning fw-bold">
+            ⬅ Volver a los Archivos Jedi
+        </a>
+    </div>
+
+    @if (cargando)
+    {
+        <div class="text-center my-5 py-5">
+            <div class="spinner-border text-warning" role="status" style="width: 3rem; height: 3rem;"></div>
+            <p class="mt-3 text-light">Descifrando holocrón con la información del personaje...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
+    else if (personaje != null)
+    {
+        <div class="card shadow-lg text-white" style="background: #1a1a1a; border: 2px solid #ffe81f; border-radius: 14px;">
+            <div class="card-header py-3" style="background: #252525; border-bottom: 1px solid #444;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="fw-bold mb-0" style="color: #ffe81f;">@personaje.Name</h2>
+                    <span class="badge" style="background-color: #ffe81f; color: #000; font-size: 0.9rem;">ID: #@Id</span>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3" style="color: #ffe81f;">📋 Características Físicas y Biográficas</h5>
+                
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">AÑO DE NACIMIENTO</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.BirthYear) ? "Desconocido" : personaje.BirthYear)</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">GÉNERO</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.Gender) ? "Desconocido" : personaje.Gender)</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">ESTATURA</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.Height) ? "Desconocido" : $"{personaje.Height} cm")</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">PESO / MASA</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.Mass) ? "Desconocido" : $"{personaje.Mass} kg")</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">COLOR DE OJOS</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.EyeColor) ? "Desconocido" : personaje.EyeColor)</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">COLOR DE CABELLO</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.HairColor) ? "Desconocido" : personaje.HairColor)</h6>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="p-3 rounded" style="background: #262626;">
+                            <p class="mb-1 small fw-bold" style="color: #ffe81f;">COLOR DE PIEL</p>
+                            <h6 class="fw-bold mb-0">@(string.IsNullOrWhiteSpace(personaje.SkinColor) ? "Desconocido" : personaje.SkinColor)</h6>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: #444;" />
+
+                <h5 class="fw-bold mb-3" style="color: #ffe81f;">🎬 Apariciones Registradas</h5>
+                <div class="row g-2">
+                    <div class="col-4 text-center p-2 rounded" style="background: #262626; border: 1px solid #3a3a3a;">
+                        <span class="d-block fw-bold fs-5" style="color: #ffe81f;">@(personaje.Films?.Count ?? 0)</span>
+                        <small class="fw-semibold" style="color: #e4e4e7;">Películas</small>
+                    </div>
+                    <div class="col-4 text-center p-2 rounded" style="background: #262626; border: 1px solid #3a3a3a;">
+                        <span class="d-block fw-bold fs-5" style="color: #ffe81f;">@(personaje.Starships?.Count ?? 0)</span>
+                        <small class="fw-semibold" style="color: #e4e4e7;">Naves</small>
+                    </div>
+                    <div class="col-4 text-center p-2 rounded" style="background: #262626; border: 1px solid #3a3a3a;">
+                        <span class="d-block fw-bold fs-5" style="color: #ffe81f;">@(personaje.Vehicles?.Count ?? 0)</span>
+                        <small class="fw-semibold" style="color: #e4e4e7;">Vehículos</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private CharacterDto? personaje;
+    private bool cargando = true;
+    private string? mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            if (!UserState.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            personaje = await Http.GetFromJsonAsync<CharacterDto>($"api/Character/{Id}");
+            if (personaje == null)
+            {
+                mensajeError = "No se encontró información para el personaje solicitado.";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error al consultar el detalle: " + ex.Message;
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+}

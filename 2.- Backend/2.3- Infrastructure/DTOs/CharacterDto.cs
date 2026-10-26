@@ -4,27 +4,53 @@ namespace DTOs
 {
     public class CharacterDto
     {
+        // se realiza esta correccion para que System.Text.Json no se confunda y pueda traducir correctamente cada campo de swapi
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
         [JsonPropertyName("birth_year")]
         public string BirthYear { get; set; }
 
-        [JsonPropertyName("EyeColor")]
+        [JsonPropertyName("eye_color")]
         public string EyeColor { get; set; }
-        public string Gender { get; set; }
-        public string Hair_color { get; set; }
-        public string Height { get; set; }
-        public string Mass { get; set; }
-        public string Skin_color { get; set; }
-        public string Homeworld { get; set; }
-        public List<string> Films { get; set; }
-        public List<string> Species { get; set; }
-        public List<string> Starships { get; set; }
-        public List<string> Vehicles { get; set; }
-        public string Url { get; set; }
-        public string Created { get; set; }
-        public string Edited { get; set; }
 
+        [JsonPropertyName("gender")]
+        public string Gender { get; set; } = string.Empty;
+
+        [JsonPropertyName("hair_color")]
+        public string HairColor { get; set; } = string.Empty;
+
+        [JsonPropertyName("height")]
+        public string Height { get; set; } = string.Empty;
+
+        [JsonPropertyName("mass")]
+        public string Mass { get; set; } = string.Empty;
+
+        [JsonPropertyName("skin_color")]
+        public string SkinColor { get; set; } = string.Empty;
+
+        [JsonPropertyName("homeworld")]
+        public string Homeworld { get; set; } = string.Empty;
+
+        [JsonPropertyName("films")]
+        public List<string> Films { get; set; } = new();
+
+        [JsonPropertyName("species")]
+        public List<string> Species { get; set; } = new();
+
+        [JsonPropertyName("starships")]
+        public List<string> Starships { get; set; } = new();
+
+        [JsonPropertyName("vehicles")]
+        public List<string> Vehicles { get; set; } = new();
+
+        [JsonPropertyName("url")]
+        public string Url { get; set; } = string.Empty;
+
+        [JsonPropertyName("created")]
+        public string Created { get; set; } = string.Empty;
+
+        [JsonPropertyName("edited")]
+        public string Edited { get; set; } = string.Empty;
     }
 }

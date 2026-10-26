@@ -1,0 +1,116 @@
+﻿@page "/characters"
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+
+@using DTOs
+@using StarWarsWeb.Client.Utils
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@inject UserState UserState
+
+<PageTitle>Personajes de Star Wars</PageTitle>
+
+<div class="container mt-4 mb-5">
+    <div>
+        <h1 class="fw-bold mb-1" style="color: #ffe81f; letter-spacing: 1px;">Archivos Jedi</h1>
+        <p class="small" style="color: #d4d4d8;">
+            Acceso concedido a: <strong style="color: #ffe81f;">@(UserState.FullName ?? "Oficial de la Alianza")</strong>
+        </p>
+    </div>
+
+    @if (cargando)
+    {
+        <div class="text-center my-5 py-5">
+            <div class="spinner-border text-warning" role="status" style="width: 3.5rem; height: 3.5rem;"></div>
+            <p class="mt-3 text-light fw-bold">Descifrando datos desde la red SWAPI...</p>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger" role="alert">
+            @mensajeError
+        </div>
+    }
+    else if (personajes == null || !personajes.Any())
+    {
+        <div class="alert alert-info">No se encontraron personajes disponibles.</div>
+    }
+    else
+    {
+        <!-- Grid de tarjetas de personajes con avatar galáctico -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var personaje in personajes)
+            {
+                var id = ObtenerIdDeUrl(personaje.Url);
+
+                <div class="col">
+                    <div class="card h-100 shadow text-white" style="background: #181818; border: 1px solid #333; border-radius: 12px; transition: all 0.3s;">
+                        <div class="card-body p-4 text-center">
+                            
+                            <!-- Avatar galáctico seguro (iniciales) -->
+                            <div class="d-inline-flex justify-content-center align-items-center mb-3 rounded-circle shadow" 
+                                 style="width: 75px; height: 75px; background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); border: 2px solid #ffe81f; color: #ffe81f; font-size: 1.5rem; font-weight: bold;">
+                                @(string.IsNullOrEmpty(personaje.Name) ? "SW" : personaje.Name.Substring(0, 1))
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-3" style="color: #ffe81f;">@personaje.Name</h5>
+                            
+                            <div class="text-start p-3 rounded mb-3" style="background: #222;">
+                                <p class="card-text mb-1 small"><strong style="color: #ffe81f;">Género:</strong> <span class="text-white">@(personaje.Gender ?? "Desconocido")</span></p>
+                                <p class="card-text mb-1 small"><strong style="color: #ffe81f;">Nacimiento:</strong> <span class="text-white">@(personaje.BirthYear ?? "N/A")</span></p>
+                                <p class="card-text mb-0 small"><strong style="color: #ffe81f;">Estatura:</strong> <span class="text-white">@(personaje.Height ?? "N/A") cm</span></p>
+                            </div>
+                            
+                            <a href="@($"/character/{id}")" class="btn w-100 fw-bold py-2" style="background-color: #ffe81f; color: #000; border-radius: 8px;">
+                                Ver Ficha Completa ➜
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<CharacterDto>? personajes;
+    private bool cargando = true;
+    private string? mensajeError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 🔒 Candado de seguridad: si no está autenticado, mandar a login
+        if (!UserState.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        await CargarPersonajes();
+    }
+
+    private async Task CargarPersonajes()
+    {
+        cargando = true;
+        mensajeError = null;
+
+        try
+        {
+            personajes = await Http.GetFromJsonAsync<List<CharacterDto>>("api/Character/Personajes");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "No se pudieron cargar los personajes: " + ex.Message;
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private string ObtenerIdDeUrl(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return "1";
+        return url.TrimEnd('/').Split('/').Last();
+    }
+}
