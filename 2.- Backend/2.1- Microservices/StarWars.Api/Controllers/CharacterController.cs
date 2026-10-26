@@ -12,12 +12,12 @@ namespace StarWars.Api.Controllers
     {
         [HttpGet("Personajes")]
         [SwaggerOperation(Summary = "Obtiene la lista general de personajes.")]
-        public async Task<ActionResult<List<CharacterDto>>> GetAll()
+        public async Task<ActionResult<SwapiResponseDto>> GetAll([FromQuery] int page = 1)
         {
-            var personajes = await swapiService.GetCharactersAsync();
-            return Ok(personajes);
+            var resultado = await swapiService.GetCharactersAsync(page);
+            return Ok(resultado);
         }
-       
+
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Obtiene el detalle de un personaje por su ID.")]
         public async Task<ActionResult<CharacterDto>> GetById(string id)

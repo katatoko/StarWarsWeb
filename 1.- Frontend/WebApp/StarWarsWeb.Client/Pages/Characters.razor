@@ -69,6 +69,23 @@
                 </div>
             }
         </div>
+
+        <!-- Control de Paginación -->
+        <div class="d-flex justify-content-center align-items-center gap-3 my-5">
+            <button class="btn btn-outline-warning fw-bold px-4 py-2"
+                    disabled="@(!tieneAnterior)"
+                    @onclick="() => CambiarPagina(paginaActual - 1)">
+                ◀ Anterior
+            </button>
+            <span class="text-white fw-bold fs-5">
+                Página <span style="color: #ffe81f;">@paginaActual</span> de @totalPaginas
+            </span>
+            <button class="btn btn-outline-warning fw-bold px-4 py-2"
+                    disabled="@(!tieneSiguiente)"
+                    @onclick="() => CambiarPagina(paginaActual + 1)">
+                Siguiente ▶
+            </button>
+        </div>
     }
 </div>
 
@@ -76,6 +93,10 @@
     private List<CharacterDto>? personajes;
     private bool cargando = true;
     private string? mensajeError;
+    private int paginaActual = 1;
+    private bool tieneSiguiente = false;
+    private bool tieneAnterior = false;
+    private int totalPaginas = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,7 +117,17 @@
 
         try
         {
-            personajes = await Http.GetFromJsonAsync<List<CharacterDto>>("api/Character/Personajes");
+            // Se envía la página actual en la petición
+            var respuesta = await Http.GetFromJsonAsync<SwapiResponseDto>($"api/Character/Personajes?page={paginaActual}");
+            personajes = respuesta?.Results ?? new();
+
+            // Si Next tiene texto, hay siguiente página, si es null, es última página
+            tieneSiguiente = !string.IsNullOrEmpty(respuesta?.Next);
+
+            // Si Previous tiene texto, hay página anterior, si es null, es primer página
+            tieneAnterior = !string.IsNullOrEmpty(respuesta?.Previous);
+
+            totalPaginas = (int)Math.Ceiling((respuesta?.Count ?? 0) / 10.0);
         }
         catch (Exception ex)
         {
@@ -105,6 +136,15 @@
         finally
         {
             cargando = false;
+        }
+    }
+
+    private async Task CambiarPagina(int nuevaPagina)
+    {
+        if (nuevaPagina >= 1)
+        {
+            paginaActual = nuevaPagina;
+            await CargarPersonajes();
         }
     }
 

@@ -42,6 +42,41 @@
             </div>
 
             <div class="card-body p-4">
+
+                <!-- SECCIÓN DE IMAGEN DEL PERSONAJE -->
+                <div class="text-center mb-4 p-3 rounded" style="background: #202020; border: 1px dashed #ffe81f;">
+
+                    <!-- guarda la imagen en la DB, el fallback es automático si aún no tiene foto, es una foto por defecto -->
+                    <div class="mb-3">
+                        <img src="@urlImagen"
+                             alt="@personaje.Name"
+                             class="img-fluid rounded shadow"
+                             style="max-height: 220px; border: 2px solid #ffe81f; object-fit: cover;"
+                             onerror="this.style.display='none'; document.getElementById('avatar-defecto').style.display='inline-flex';" />
+
+                        <!-- Avatar por defecto si la API devuelve 404, es decir que no tiene foto aún -->
+                        <div id="avatar-defecto"
+                             class="justify-content-center align-items-center rounded-circle shadow"
+                             style="display: none; width: 90px; height: 90px; background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); border: 2px solid #ffe81f; color: #ffe81f; font-size: 2rem; font-weight: bold; margin: 0 auto;">
+                            @(string.IsNullOrEmpty(personaje.Name) ? "SW" : personaje.Name.Substring(0, 1))
+                        </div>
+                    </div>
+
+                    <!-- botón interactivo para elegir y subir archivo -->
+                    <div>
+                        <label class="btn fw-bold px-3 py-2" style="background-color: #ffe81f; color: #000; cursor: pointer; border-radius: 8px;">
+                            📷 @(subiendo ? "Subiendo archivo..." : "Elegir / Cambiar Imagen")
+                            <InputFile OnChange="SubirImagen" class="d-none" accept="image/png, image/jpeg, image/webp" disabled="@subiendo" />
+                        </label>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(mensajeImagen))
+                    {
+                        <div class="mt-2 small text-warning fw-bold">@mensajeImagen</div>
+                    }
+                </div>
+
+
                 <h5 class="fw-bold mb-3" style="color: #ffe81f;">📋 Características Físicas y Biográficas</h5>
                 
                 <div class="row g-3">
@@ -125,10 +160,17 @@
     private bool cargando = true;
     private string? mensajeError;
 
+    private string urlImagen = string.Empty;
+    private bool subiendo = false;
+    private string? mensajeImagen;
+
     protected override async Task OnInitializedAsync()
     {
         cargando = true;
         mensajeError = null;
+
+        // Apunta al endpoint de la API con el ID del personaje
+        urlImagen = $"https://localhost:7155/api/FilesManagement/{Id}";
 
         try
         {
@@ -153,4 +195,51 @@
             cargando = false;
         }
     }
+
+    private async Task SubirImagen(InputFileChangeEventArgs e)
+    {
+        var archivo = e.File;
+        if (archivo == null) return;
+
+        subiendo = true;
+        mensajeImagen = null;
+
+        try
+        {
+            // 1. Abrimos el flujo del archivo (límite de seguridad de 10 MB)
+            using var stream = archivo.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            using var streamContent = new StreamContent(stream);
+            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(archivo.ContentType);
+
+            // 2. Empacamos el multipart/form-data tal como lo espera FilesManagementController
+            using var formData = new MultipartFormDataContent();
+            formData.Add(streamContent, "file", archivo.Name);
+            formData.Add(new StringContent(Id), "characterId");
+
+            // 3. Enviamos la petición POST
+            var respuesta = await Http.PostAsync("api/FilesManagement/upload", formData);
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                mensajeImagen = "¡Imagen guardada en la base de datos con éxito!";
+                // Agregamos un timestamp para obligar al navegador a recargar la nueva imagen
+                urlImagen = $"https://localhost:7155/api/FilesManagement/{Id}?t={DateTime.UtcNow.Ticks}";
+            }
+            else
+            {
+                var error = await respuesta.Content.ReadAsStringAsync();
+                mensajeImagen = $"Error al guardar: {error}";
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeImagen = $"Error inesperado: {ex.Message}";
+        }
+        finally
+        {
+            subiendo = false;
+            StateHasChanged();
+        }
+    }
+
 }

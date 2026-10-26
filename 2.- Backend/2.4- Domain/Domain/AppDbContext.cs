@@ -10,5 +10,7 @@ namespace StarWars.Domain
         {
 
         }
+        public DbSet<CharacterImage> CharacterImages => Set<CharacterImage>();
+
     }
 }
