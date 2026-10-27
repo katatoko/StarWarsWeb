@@ -52,7 +52,8 @@
                              alt="@personaje.Name"
                              class="img-fluid rounded shadow"
                              style="max-height: 220px; border: 2px solid #ffe81f; object-fit: cover;"
-                             onerror="this.style.display='none'; document.getElementById('avatar-defecto').style.display='inline-flex';" />
+                             onload="this.style.display='inline-block'; var def = document.getElementById('avatar-defecto'); if(def) def.style.display='none';"
+                             onerror="this.style.display='none'; var def = document.getElementById('avatar-defecto'); if(def) def.style.display='inline-flex';" />
 
                         <!-- Avatar por defecto si la API devuelve 404, es decir que no tiene foto aún -->
                         <div id="avatar-defecto"

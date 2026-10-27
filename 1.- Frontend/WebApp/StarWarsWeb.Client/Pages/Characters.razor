@@ -47,10 +47,20 @@
                     <div class="card h-100 shadow text-white" style="background: #181818; border: 1px solid #333; border-radius: 12px; transition: all 0.3s;">
                         <div class="card-body p-4 text-center">
                             
-                            <!-- Avatar galáctico seguro (iniciales) -->
-                            <div class="d-inline-flex justify-content-center align-items-center mb-3 rounded-circle shadow" 
-                                 style="width: 75px; height: 75px; background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); border: 2px solid #ffe81f; color: #ffe81f; font-size: 1.5rem; font-weight: bold;">
-                                @(string.IsNullOrEmpty(personaje.Name) ? "SW" : personaje.Name.Substring(0, 1))
+                            <!-- Avatar más grande y centrado (105px) sin colisión de estilos -->
+                            <div class="mb-3 d-flex justify-content-center">
+                                <img src="@($"https://localhost:7155/api/FilesManagement/{id}")"
+                                     alt="@personaje.Name"
+                                     class="rounded-circle shadow"
+                                     style="display: none; width: 105px; height: 105px; object-fit: cover; border: 3px solid #ffe81f;"
+                                     onload="this.style.display='block'; var def = document.getElementById('avatar-@id'); if(def) def.style.display='none';"
+                                     onerror="this.style.display='none'; var def = document.getElementById('avatar-@id'); if(def) def.style.display='flex';" />
+
+                                <div id="avatar-@id"
+                                     class="justify-content-center align-items-center rounded-circle shadow" 
+                                     style="display: flex; width: 105px; height: 105px; background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); border: 3px solid #ffe81f; color: #ffe81f; font-size: 2.2rem; font-weight: bold;">
+                                    @(string.IsNullOrEmpty(personaje.Name) ? "SW" : personaje.Name.Substring(0, 1))
+                                </div>
                             </div>
 
                             <h5 class="card-title fw-bold mb-3" style="color: #ffe81f;">@personaje.Name</h5>
