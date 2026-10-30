@@ -52,13 +52,13 @@
                                 <img src="@($"https://localhost:7155/api/FilesManagement/{id}")"
                                      alt="@personaje.Name"
                                      class="rounded-circle shadow"
-                                     style="display: none; width: 105px; height: 105px; object-fit: cover; border: 3px solid #ffe81f;"
+                                     style="display: none; width: 300px; height: 300px; object-fit: cover; border: 3px solid #ffe81f;"
                                      onload="this.style.display='block'; var def = document.getElementById('avatar-@id'); if(def) def.style.display='none';"
                                      onerror="this.style.display='none'; var def = document.getElementById('avatar-@id'); if(def) def.style.display='flex';" />
 
                                 <div id="avatar-@id"
                                      class="justify-content-center align-items-center rounded-circle shadow" 
-                                     style="display: flex; width: 105px; height: 105px; background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); border: 3px solid #ffe81f; color: #ffe81f; font-size: 2.2rem; font-weight: bold;">
+                                     style="display: flex; width: 300px; height: 300px; background: linear-gradient(135deg, #2b2b2b 0%, #111 100%); border: 3px solid #ffe81f; color: #ffe81f; font-size: 2.2rem; font-weight: bold;">
                                     @(string.IsNullOrEmpty(personaje.Name) ? "SW" : personaje.Name.Substring(0, 1))
                                 </div>
                             </div>
