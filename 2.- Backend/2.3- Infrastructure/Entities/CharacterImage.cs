@@ -12,9 +12,9 @@ namespace Entities
         public long CharacterId { get; set; }
 
         //Nombre del archivo de imagen
-        public string FileName { get; set; }
+        public string FileName { get; set; } = string.Empty;
 
-        public string ContentType { get; set; }
+        public string ContentType { get; set; } = string.Empty;
 
         //Guarda los bytes de la imagen directamente en PostgreSQL (tipo bytea)
         public byte[] Data { get; set; } = [];

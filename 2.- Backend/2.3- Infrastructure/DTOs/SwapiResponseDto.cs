@@ -5,9 +5,9 @@ using System.Text.Json.Serialization;
 
 namespace DTOs
 {
-    public class SwapiResponseDto
+    public class SwapiResponseDto()
     {
-        //devuelve count por paginación, total de pjs
+        //devuelve count por paginacion, total de pjs
         [JsonPropertyName("count")]
         public int Count { get; set; }
 

@@ -171,7 +171,8 @@
         mensajeError = null;
 
         // Apunta al endpoint de la API con el ID del personaje
-        urlImagen = $"https://localhost:7155/api/FilesManagement/{Id}";
+        //urlImagen = $"https://localhost:7155/api/FilesManagement/{Id}";
+        urlImagen = $"{Http.BaseAddress}api/FilesManagement/{Id}";
 
         try
         {
@@ -224,7 +225,7 @@
             {
                 mensajeImagen = "¡Imagen guardada en la base de datos con éxito!";
                 // Agregamos un timestamp para obligar al navegador a recargar la nueva imagen
-                urlImagen = $"https://localhost:7155/api/FilesManagement/{Id}?t={DateTime.UtcNow.Ticks}";
+                urlImagen = $"{Http.BaseAddress}api/FilesManagement/{Id}?t={DateTime.UtcNow.Ticks}";
             }
             else
             {

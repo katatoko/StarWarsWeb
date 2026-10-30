@@ -1,0 +1,25 @@
+﻿  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+  DTOs -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\2.- Backend\2.3- Infrastructure\DTOs\bin\Debug\net10.0\DTOs.dll
+  StarWars.Services -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\2.- Backend\2.2- Logic\StarWars.Services\bin\Debug\net10.0\StarWars.Services.dll
+  Entities -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\2.- Backend\2.3- Infrastructure\Entities\bin\Debug\net10.0\Entities.dll
+  Domain -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\2.- Backend\2.4- Domain\Domain\bin\Debug\net10.0\Domain.dll
+  StarWars.Api -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\2.- Backend\2.1- Microservices\StarWars.Api\bin\Debug\net10.0\StarWars.Api.dll
+
+Compilaci├│n correcta.
+    0 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:05.47
+  Determinando los proyectos que se van a restaurar...
+  Todos los proyectos est├ín actualizados para la restauraci├│n.
+  DTOs -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\2.- Backend\2.3- Infrastructure\DTOs\bin\Debug\net10.0\DTOs.dll
+  StarWarsWeb.Client -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\1.- Frontend\WebApp\StarWarsWeb.Client\bin\Debug\net10.0\StarWarsWeb.Client.dll
+  StarWarsWeb.Client (Blazor output) -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\1.- Frontend\WebApp\StarWarsWeb.Client\bin\Debug\net10.0\wwwroot
+  StarWarsWeb -> C:\Users\ADMIN\Documents\GitHub\StarWarsWeb\1.- Frontend\WebApp\StarWarsWeb\bin\Debug\net10.0\StarWarsWeb.dll
+
+Compilaci├│n correcta.
+    0 Advertencia(s)
+    0 Errores
+
+Tiempo transcurrido 00:00:11.70

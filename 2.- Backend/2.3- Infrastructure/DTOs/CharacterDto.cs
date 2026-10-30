@@ -6,13 +6,13 @@ namespace DTOs
     {
         // se realiza esta correccion para que System.Text.Json no se confunda y pueda traducir correctamente cada campo de swapi
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("birth_year")]
-        public string BirthYear { get; set; }
+        public string BirthYear { get; set; } = string.Empty;
 
         [JsonPropertyName("eye_color")]
-        public string EyeColor { get; set; }
+        public string EyeColor { get; set; } = string.Empty;
 
         [JsonPropertyName("gender")]
         public string Gender { get; set; } = string.Empty;

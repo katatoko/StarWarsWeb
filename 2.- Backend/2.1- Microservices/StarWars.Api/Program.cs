@@ -32,11 +32,14 @@ namespace StarWars.Api
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
+            // Para que la carpeta de red no quede expuesta para cualquier dirección - CORS
+            var origenesPermitidos = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? [];
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins(origenesPermitidos)
                           .AllowAnyMethod()
                           .AllowAnyHeader();
                 });

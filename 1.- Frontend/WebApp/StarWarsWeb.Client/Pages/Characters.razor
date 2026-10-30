@@ -47,9 +47,10 @@
                     <div class="card h-100 shadow text-white" style="background: #181818; border: 1px solid #333; border-radius: 12px; transition: all 0.3s;">
                         <div class="card-body p-4 text-center">
                             
+                             @* se reemplaza con la dir base para no repetir tanto la url del servidor, debe existir solo en la config de appsettings *@
                             <!-- Avatar más grande y centrado (105px) sin colisión de estilos -->
                             <div class="mb-3 d-flex justify-content-center">
-                                <img src="@($"https://localhost:7155/api/FilesManagement/{id}")"
+                                <img src="@($"{Http.BaseAddress}api/FilesManagement/{id}")"
                                      alt="@personaje.Name"
                                      class="rounded-circle shadow"
                                      style="display: none; width: 300px; height: 300px; object-fit: cover; border: 3px solid #ffe81f;"
