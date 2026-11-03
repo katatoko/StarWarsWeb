@@ -1,6 +1,9 @@
-# Auto detect text files and perform LF normalization
+# Normalización de saltos de línea
 * text=auto
 
-# Auto detect text files and perform LF normalization
-* text=auto
+# Ignorar reportes generados de NDepend para que no cuenten en las estadísticas
+NDependOut/** linguist-vendored
+docs/** linguist-documentation
+
+# Mapear componentes Blazor a C#
 *.razor linguist-language=C#
